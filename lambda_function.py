@@ -1,10 +1,13 @@
 import os
 import requests
 import psycopg2
-from dotenv import load_dotenv
 from datetime import datetime, timezone
 
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 
 def fetch_stocks():
