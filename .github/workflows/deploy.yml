@@ -15,7 +15,14 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt -t package/
+        run: |
+          pip install \
+            --platform manylinux2014_x86_64 \
+            --implementation cp \
+            --python-version 3.12 \
+            --only-binary=:all: \
+            -r requirements.txt \
+            -t package/
 
       - name: Package Lambda
         run: |
