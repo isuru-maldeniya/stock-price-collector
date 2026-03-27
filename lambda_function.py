@@ -1,5 +1,6 @@
 import json
 import os
+import ssl
 import urllib.request
 import pg8000.native
 from datetime import datetime, timezone
@@ -14,13 +15,17 @@ def fetch_stocks():
     )
     with urllib.request.urlopen(req, timeout=30) as resp:
         data = json.loads(resp.read())
-        print("API response keys:", list(data.keys()))
-        return data["reqOutput"]
+        print("API response keys:", data["reqTradeSummery"])
+        return data["reqTradeSummery"]
 
 
 def lambda_handler(event, context):
     prices = fetch_stocks()
     now = datetime.now(timezone.utc)
+
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
 
     conn = pg8000.native.Connection(
         host=os.environ["DB_HOST"],
@@ -28,6 +33,7 @@ def lambda_handler(event, context):
         database=os.environ["DB_NAME"],
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
+        ssl_context=ssl_context,
     )
 
     try:
