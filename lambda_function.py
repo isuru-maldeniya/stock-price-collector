@@ -13,7 +13,9 @@ def fetch_stocks():
         data=b"",
     )
     with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read())["reqOutput"]
+        data = json.loads(resp.read())
+        print("API response keys:", list(data.keys()))
+        return data["reqOutput"]
 
 
 def lambda_handler(event, context):
