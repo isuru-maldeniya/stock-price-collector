@@ -14,15 +14,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies and package
+      - name: Create venv and install dependencies
         run: |
-          docker run --rm -v "$PWD":/var/task public.ecr.aws/lambda/python:3.12 \
-            bash -c "pip install -r requirements.txt -t /var/task/package/"
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
 
       - name: Package Lambda
         run: |
-          cd package && zip -r ../deploy.zip .
-          cd .. && zip deploy.zip lambda_function.py
+          SITE_PACKAGES=$(find venv/lib -type d -name "site-packages" | head -1)
+          cd "$SITE_PACKAGES" && zip -r "$GITHUB_WORKSPACE/deploy.zip" .
+          cd "$GITHUB_WORKSPACE" && zip deploy.zip lambda_function.py
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
