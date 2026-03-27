@@ -1,42 +1,38 @@
-import json
-import urllib.request
-import boto3
+import os
+import requests
 import psycopg2
 from datetime import datetime, timezone
 
-
-def get_db_credentials():
-    client = boto3.client("secretsmanager")
-    secret = json.loads(
-        client.get_secret_value(SecretId="stock-collector/db-credentials")[
-            "SecretString"
-        ]
-    )
-    return secret
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 
 def fetch_stocks():
-    req = urllib.request.Request(
+    resp = requests.post(
         "https://www.cse.lk/api/tradeSummary",
-        method="POST",
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         data=b"",
+        timeout=30,
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read())["reqOutput"]
+    resp.raise_for_status()
+    print("Fetched stock data successfully: ", resp.json()["reqTradeSummery"])
+    return resp.json()["reqTradeSummery"]
 
 
 def lambda_handler(event, context):
     prices = fetch_stocks()
-    creds = get_db_credentials()
     now = datetime.now(timezone.utc)
 
     conn = psycopg2.connect(
-        host=creds["host"],
-        port=creds.get("port", 5432),
-        dbname=creds["dbname"],
-        user=creds["username"],
-        password=creds["password"],
+        host=os.environ["DB_HOST"],
+        port=int(os.environ.get("DB_PORT", "5432")),
+        dbname=os.environ["DB_NAME"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        sslmode="disable",
     )
 
     try:
@@ -53,20 +49,21 @@ def lambda_handler(event, context):
 
                 cur.execute(
                     """
-                    INSERT INTO market."STOCK_PRICE"
-                        ("STOCK_ID", "PRICE", "OPEN", "HIGH", "LOW", "CHANGE", "CHANGE_PCT", "VOLUME", "COLLECTED_AT")
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO market."MARKET_PRICES"
+                        ("STOCK_ID", "PRICE", "TIME_STAMP", "DATE", "OPEN", "HIGH", "LOW", "CHANGE", "CHANGE_PCT", "VOLUME")
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
                         stock_id,
                         p.get("price"),
+                        now,
+                        now.date(),
                         p.get("open"),
                         p.get("high"),
                         p.get("low"),
                         p.get("change"),
                         p.get("percentageChange"),
                         p.get("sharevolume"),
-                        now,
                     ),
                 )
                 count += 1

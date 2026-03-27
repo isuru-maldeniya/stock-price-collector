@@ -1,33 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:www.stockanalyzer.lk)",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/todaySharePrice' -H 'Content-Type: application/x-www-form-urlencoded' --max-time 15)",
-      "Bash(python3 -m json.tool)",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/marketStatus' -H 'Content-Type: application/x-www-form-urlencoded' --max-time 15)",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/companyInfoSummery' -H 'Content-Type: application/x-www-form-urlencoded' -d 'symbol=JKH.N0000' --max-time 15)",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/detailedTrades' -H 'Content-Type: application/x-www-form-urlencoded' --max-time 15)",
-      "WebFetch(domain:diri.lk)",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/marketSummery' -H 'Content-Type: application/x-www-form-urlencoded' --max-time 15)",
-      "Bash(git init:*)",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/detailedTrades' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0' --data '')",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/tradeSummary' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0' --data '')",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/mostActiveTrades' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0' --data '')",
-      "Bash(curl -s 'https://www.cse.lk' -H 'User-Agent: Mozilla/5.0')",
-      "Bash(curl -s 'https://www.cse.lk/_next/static/chunks/501c19a346edb4d3.js' -H 'User-Agent: Mozilla/5.0')",
-      "Bash(grep -oiE 'wss?://[^\"\"\"\"''''` ]+|websocket|socket|MarketWebSocket')",
-      "Bash(curl -s 'https://www.cse.lk/_next/static/chunks/62fe92aa5a435f21.js' -H 'User-Agent: Mozilla/5.0')",
-      "Bash(grep -oiE 'wss?://[^\"\"\"\"''''` ]+|websocket|MarketWebSocket|\\\\.connect|socket\\\\.io')",
-      "Bash(curl -s 'https://www.cse.lk/_next/static/chunks/b3faf8a3f7fb5733.js' -H 'User-Agent: Mozilla/5.0')",
-      "Bash(grep -oiE 'wss?://[^\"\"\"\"''''` ]+|websocket|MarketWebSocket|\\\\.connect|socket')",
-      "Bash(curl -s 'https://www.cse.lk/_next/static/chunks/2a7df5c9e2f05b64.js' -H 'User-Agent: Mozilla/5.0')",
-      "Bash(grep -oiP '\\(wss?://[^\"\"\"\"''''` ]+|https?://[^\"\"\"\"''''` ]*socket[^\"\"\"\"''''` ]*|https?://[^\"\"\"\"''''` ]*stomp[^\"\"\"\"''''` ]*\\)')",
-      "Bash(grep -oP '.{0,100}\\(WebSocket|CONNECT|stomp|subscribe|ws://\\).{0,100}')",
-      "Bash(tr ';' '\\\\n')",
-      "Bash(curl -s -X POST 'https://www.cse.lk/api/todaySharePrice' -H 'Content-Type: application/x-www-form-urlencoded' -H 'User-Agent: Mozilla/5.0' --data '')",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[list\\(d.keys\\(\\)\\)[0]][0], indent=2\\)\\)\")",
+      "Bash(source /Users/isurumaldeniya/Desktop/air_work_space/projects/stock-price-collector/venv/bin/activate)",
+      "Bash(pip install:*)",
       "Bash(python3 -c \":*)"
     ]
   }
