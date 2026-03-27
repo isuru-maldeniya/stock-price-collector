@@ -1,1 +1,1 @@
-aws-psycopg2
+pg8000
