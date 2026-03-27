@@ -33,15 +33,14 @@ aws lambda create-function \
 The Lambda execution role needs:
 
 - `AWSLambdaBasicExecutionRole` (CloudWatch logs)
-- `secretsmanager:GetSecretValue` for `stock-collector/db-credentials`
 - VPC access if your PostgreSQL is in a VPC
 
-## 5. Create the Secret in Secrets Manager
+## 5. Set Lambda Environment Variables
 
 ```bash
-aws secretsmanager create-secret \
-  --name stock-collector/db-credentials \
-  --secret-string '{"host":"<DB_HOST>","port":5432,"dbname":"<DB_NAME>","username":"<DB_USER>","password":"<DB_PASS>"}'
+aws lambda update-function-configuration \
+  --function-name stock-price-collector \
+  --environment "Variables={DB_HOST=<DB_HOST>,DB_PORT=5432,DB_NAME=<DB_NAME>,DB_USER=<DB_USER>,DB_PASSWORD=<DB_PASS>}"
 ```
 
 ## 6. Create the STOCK_PRICE Table

@@ -1,18 +1,8 @@
 import json
+import os
 import urllib.request
-import boto3
 import psycopg2
 from datetime import datetime, timezone
-
-
-def get_db_credentials():
-    client = boto3.client("secretsmanager")
-    secret = json.loads(
-        client.get_secret_value(SecretId="stock-collector/db-credentials")[
-            "SecretString"
-        ]
-    )
-    return secret
 
 
 def fetch_stocks():
@@ -28,15 +18,14 @@ def fetch_stocks():
 
 def lambda_handler(event, context):
     prices = fetch_stocks()
-    creds = get_db_credentials()
     now = datetime.now(timezone.utc)
 
     conn = psycopg2.connect(
-        host=creds["host"],
-        port=creds.get("port", 5432),
-        dbname=creds["dbname"],
-        user=creds["username"],
-        password=creds["password"],
+        host=os.environ["DB_HOST"],
+        port=int(os.environ.get("DB_PORT", "5432")),
+        dbname=os.environ["DB_NAME"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
     )
 
     try:
