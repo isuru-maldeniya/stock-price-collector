@@ -14,15 +14,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dependencies and package
         run: |
-          pip install \
-            --platform manylinux2014_x86_64 \
-            --implementation cp \
-            --python-version 3.12 \
-            --only-binary=:all: \
-            -r requirements.txt \
-            -t package/
+          docker run --rm -v "$PWD":/var/task public.ecr.aws/lambda/python:3.12 \
+            bash -c "pip install -r requirements.txt -t /var/task/package/"
 
       - name: Package Lambda
         run: |
