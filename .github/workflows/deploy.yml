@@ -10,19 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Build clean deployment package
+      - name: Build dependencies in Lambda-compatible Docker
         run: |
           rm -rf package deploy.zip
           mkdir package
-          python -m venv venv
-          source venv/bin/activate
-          pip install --no-cache-dir -r requirements.txt
-          SITE_PACKAGES=$(find venv/lib -type d -name "site-packages" | head -1)
-          cp -r "$SITE_PACKAGES"/* package/
+          docker run --rm -v "$PWD":/build -w /build --entrypoint "" \
+            public.ecr.aws/lambda/python:3.12 \
+            bash -c "pip install --no-cache-dir -r requirements.txt -t package/"
           cp lambda_function.py package/
           cd package && zip -r "$GITHUB_WORKSPACE/deploy.zip" .
           echo "--- Deploy package contents ---"
