@@ -14,17 +14,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Create venv and install dependencies
+      - name: Build clean deployment package
         run: |
+          rm -rf package deploy.zip
+          mkdir package
           python -m venv venv
           source venv/bin/activate
-          pip install -r requirements.txt
-
-      - name: Package Lambda
-        run: |
+          pip install --no-cache-dir -r requirements.txt
           SITE_PACKAGES=$(find venv/lib -type d -name "site-packages" | head -1)
-          cd "$SITE_PACKAGES" && zip -r "$GITHUB_WORKSPACE/deploy.zip" .
-          cd "$GITHUB_WORKSPACE" && zip deploy.zip lambda_function.py
+          cp -r "$SITE_PACKAGES"/* package/
+          cp lambda_function.py package/
+          cd package && zip -r "$GITHUB_WORKSPACE/deploy.zip" .
+          echo "--- Deploy package contents ---"
+          zipinfo "$GITHUB_WORKSPACE/deploy.zip" | head -50
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
