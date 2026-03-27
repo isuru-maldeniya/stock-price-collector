@@ -1,1 +1,0 @@
-- [Secrets via env vars](project_secrets_env_vars.md) — DB creds in Lambda env vars, not Secrets Manager

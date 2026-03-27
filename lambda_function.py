@@ -1,20 +1,22 @@
-import json
 import os
-import urllib.request
+import requests
 import psycopg2
+from dotenv import load_dotenv
 from datetime import datetime, timezone
+
+load_dotenv()
 
 
 def fetch_stocks():
-    req = urllib.request.Request(
+    resp = requests.post(
         "https://www.cse.lk/api/tradeSummary",
-        method="POST",
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         data=b"",
+        timeout=30,
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        data = json.loads(resp.read())
-        return data["reqTradeSummery"]
+    resp.raise_for_status()
+    print("Fetched stock data successfully: ", resp.json()["reqTradeSummery"])
+    return resp.json()["reqTradeSummery"]
 
 
 def lambda_handler(event, context):
@@ -27,7 +29,7 @@ def lambda_handler(event, context):
         dbname=os.environ["DB_NAME"],
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
-        sslmode="require",
+        sslmode="disable",
     )
 
     try:
@@ -44,20 +46,21 @@ def lambda_handler(event, context):
 
                 cur.execute(
                     """
-                    INSERT INTO market."STOCK_PRICE"
-                        ("STOCK_ID", "PRICE", "OPEN", "HIGH", "LOW", "CHANGE", "CHANGE_PCT", "VOLUME", "COLLECTED_AT")
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO market."MARKET_PRICES"
+                        ("STOCK_ID", "PRICE", "TIME_STAMP", "DATE", "OPEN", "HIGH", "LOW", "CHANGE", "CHANGE_PCT", "VOLUME")
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
                         stock_id,
                         p.get("price"),
+                        now,
+                        now.date(),
                         p.get("open"),
                         p.get("high"),
                         p.get("low"),
                         p.get("change"),
                         p.get("percentageChange"),
                         p.get("sharevolume"),
-                        now,
                     ),
                 )
                 count += 1
